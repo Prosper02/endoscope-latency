@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+# measurement sessions are data, keep them out of the code repo unless intended
+sessions/
+*.tmp
