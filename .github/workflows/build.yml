@@ -23,6 +23,8 @@ jobs:
   windows-package:
     runs-on: windows-latest
     needs: test
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
