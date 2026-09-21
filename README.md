@@ -5,9 +5,10 @@ telementoring link, using an Arduino UNO, two TEMT6000 light sensors and one LED
 It drives the measurement, guides sensor placement, analyses the results and exports a report,
 for either a **two-screen** setup (mentee screen plus mentor screen) or a **one-screen** setup.
 
-The method, the numbers it produced on 21 September 2026 and their interpretation are in
-[docs/2026-09-21_endoscope_latency_report.pdf](docs/2026-09-21_endoscope_latency_report.pdf).
-Those ten runs ship in `sample_data/` and open from the Analysis tab.
+The method, the numbers it produced on 21 September 2026 and their interpretation are in the
+technical report [docs/2026-09-21_endoscope_latency_report.pdf](docs/2026-09-21_endoscope_latency_report.pdf)
+and in the manuscript draft [docs/paper/endoscope_latency_paper.pdf](docs/paper/endoscope_latency_paper.pdf),
+which `docs/paper/build_paper.py` regenerates from the data in `sample_data/`. Those runs open from the Analysis tab.
 
 ## How it works
 
