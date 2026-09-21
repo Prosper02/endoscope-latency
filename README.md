@@ -47,7 +47,8 @@ arduino-cli upload  --fqbn arduino:avr:uno -p COM5 firmware/endoscope_latency
 ```
 
 Serial protocol at 115200 baud: `r` raw readings with LED off, `l` raw readings with LED on,
-`m` measure, `t<n>` detection threshold, `a`/`b`/`x` time sensor A, sensor B or both.
+`m` measure, `t<n>` detection threshold, `a`/`b`/`x` time sensor A, sensor B or both,
+`z` restart trial numbering.
 Each trial prints `trial,baseA,baseB,litA,litB,riseA_ms,riseB_ms,fallA_ms,fallB_ms,linkRise_ms,linkFall_ms`.
 
 ## Install

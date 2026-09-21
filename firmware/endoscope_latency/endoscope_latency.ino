@@ -24,6 +24,7 @@
 //   m      back to measurement mode
 //   t<n>   set detection threshold to n ADC counts above baseline, e.g. t80
 //   a / b / x   measure only sensor A (A0), only sensor B (A1), or both (default)
+//   z      restart trial numbering at 1
 
 const int LED_PIN    = A2;   // A2 used as a digital output
 const int MENTEE_PIN = A0;
@@ -69,6 +70,9 @@ void handleSerial() {
     } else if (c == 'a' || c == 'b' || c == 'x') {
       useA = (c != 'b'); useB = (c != 'a');
       Serial.print(F("# channels: A=")); Serial.print(useA); Serial.print(F(" B=")); Serial.println(useB);
+    } else if (c == 'z') {
+      trial = 0;                                // restart trial numbering (sent by the app at the start of a run)
+      Serial.println(F("# trial counter reset"));
     }
   }
 }

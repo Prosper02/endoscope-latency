@@ -567,6 +567,7 @@ class MainWindow(QMainWindow):
         self.run_started = dt.datetime.now()
         self.send(f"t{self.meta.threshold}")
         self.send(self.meta.channels)
+        self.send("z")  # restart trial numbering (ignored by firmware older than the z command)
         self.send("m")
         if self.meta.ping_host:
             n = max(10, self.dur_spin.value() or 600)
@@ -651,6 +652,15 @@ class MainWindow(QMainWindow):
             v = s.get(key)
             if v:
                 bits.append(f"<b>{MEASURES[key]}</b>: {v['mean']:.0f} ms (SD {v['sd']:.0f}, n={v['n']})")
+        weak = []
+        for ch, base, lit in (("A", t.baseA, t.litA), ("B", t.baseB, t.litB)):
+            if (ch == "A" and self.setup == "one-screen-b") or (ch == "B" and self.setup == "one-screen-a"):
+                continue
+            if lit - base < 4:
+                weak.append(ch)
+        if weak:
+            bits.append(f"<span style='color:#eb6834'>Sensor {' and '.join(weak)}: after 2.5 s with the LED on the screen reads within 4 counts of dark, "
+                        f"so the OFF edge cannot be measured. The flash is only transient at this position; slide the sensor to where 'Live, LED on' stays high.</span>")
         self.summary_label.setText("<br>".join(bits))
 
     # ------------------------------------------------------------ placement

@@ -95,6 +95,7 @@ def fig_timeline(fig: Figure, runs: list[Run]) -> None:
         ax.text((s + e) / 2, top * 1.02, _wrap(name, 16), ha="center", va="bottom", fontsize=6.5, color=INK2)
     ax.set_xlabel("Trial, chronological across the selected runs")
     ax.set_ylabel("LED on to screen bright (ms)")
+    ax.set_ylim(0, top * 1.18)
     ax.legend(loc="lower left", ncol=2, frameon=False, fontsize=8)
     ax.grid(axis="x", visible=False)
     _title(ax, "Rise latency per trial")
