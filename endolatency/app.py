@@ -10,7 +10,7 @@ import sys
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as Canvas
 from matplotlib.figure import Figure
 from PySide6.QtCore import QPoint, QSettings, Qt, QTimer
-from PySide6.QtGui import QColor, QGuiApplication, QImage, QPainter, QPen, QPixmap
+from PySide6.QtGui import QColor, QGuiApplication, QIcon, QImage, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QComboBox, QFileDialog, QFormLayout, QGroupBox, QHBoxLayout, QHeaderView,
                                QLabel, QLineEdit, QListWidget, QListWidgetItem, QMainWindow, QMessageBox, QPlainTextEdit, QPushButton,
                                QScrollArea, QSizePolicy, QSpinBox, QSplitter, QTableWidget, QTableWidgetItem, QTabWidget, QTextEdit,
@@ -23,7 +23,20 @@ from .model import (APPLICATIONS, MEASURES, SCENES, SETUPS, Run, RunMeta, channe
 from .placement import Spot, annotate, describe_spot, find_led_spots, grab_monitors, placement_guide, sensor_verdict
 from .serial_link import ArduinoLink, PingWorker, available_ports
 
-SAMPLE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "sample_data", "2026-09-21")
+def resource_root() -> str:
+    """Folder that holds sample_data/, firmware/ and endolatency/assets/ (repo root, site-packages, or the PyInstaller bundle)."""
+    if getattr(sys, "frozen", False):
+        exe_dir = os.path.dirname(sys.executable)
+        for base in (getattr(sys, "_MEIPASS", None), exe_dir, os.path.join(exe_dir, "_internal")):
+            if base and os.path.isdir(os.path.join(base, "endolatency", "assets")):
+                return base
+        return exe_dir
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+ROOT = resource_root()
+ICON_PATH = os.path.join(ROOT, "endolatency", "assets", "icon.ico")
+SAMPLE_DIR = os.path.join(ROOT, "sample_data", "2026-09-21")
 DEFAULT_SESSIONS = os.path.join(os.path.expanduser("~"), "Documents", "EndoLatency", "sessions")
 
 
@@ -88,6 +101,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f"EndoLatency {__version__}")
+        if os.path.exists(ICON_PATH):
+            self.setWindowIcon(QIcon(ICON_PATH))
         self.resize(1280, 820)
         self.settings = QSettings("EndoLatency", "EndoLatency")
         self.link: ArduinoLink | None = None
@@ -327,6 +342,9 @@ class MainWindow(QMainWindow):
         b3 = QPushButton("Open sample data")
         b3.setToolTip("The ten runs recorded on 21 September 2026 that ship with the app")
         b3.clicked.connect(self.open_sample)
+        if not os.path.isdir(SAMPLE_DIR):
+            b3.setEnabled(False)
+            b3.setToolTip("Sample data is not included in this installation; clone the repository to get it")
         row2.addWidget(b3)
         ll.addLayout(row2)
         ll.addWidget(QLabel("Runs (select one or more; the first selected is the comparison baseline)"))
@@ -819,8 +837,16 @@ class MainWindow(QMainWindow):
 
 
 def main() -> None:
+    if os.name == "nt":
+        try:  # let Windows show the app's own icon in the taskbar instead of Python's
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("EndoLatency.EndoLatency")
+        except Exception:
+            pass
     app = QApplication(sys.argv)
     app.setApplicationName("EndoLatency")
+    if os.path.exists(ICON_PATH):
+        app.setWindowIcon(QIcon(ICON_PATH))
     win = MainWindow()
     win.show()
     sys.exit(app.exec())

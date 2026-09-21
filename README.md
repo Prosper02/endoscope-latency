@@ -50,15 +50,39 @@ Serial protocol at 115200 baud: `r` raw readings with LED off, `l` raw readings 
 `m` measure, `t<n>` detection threshold, `a`/`b`/`x` time sensor A, sensor B or both.
 Each trial prints `trial,baseA,baseB,litA,litB,riseA_ms,riseB_ms,fallA_ms,fallB_ms,linkRise_ms,linkFall_ms`.
 
-## Install and run
+## Install
+
+**Windows, nothing else needed.** Download `EndoLatency-win32.zip` from the
+[Releases](../../releases) page, extract it anywhere, and run `EndoLatency.exe` inside the
+folder. The zip is built automatically by GitHub Actions whenever a version tag is pushed
+(`git tag v0.1.0 && git push --tags`). To build it yourself: `pip install pyinstaller` then
+`python build_exe.py`; the result is `dist/EndoLatency/` and `dist/EndoLatency-win32.zip`.
+
+**With Python (Windows, macOS, Linux).** Python 3.10 or newer:
 
 ```
+pip install git+https://github.com/Prosper02/endoscope-latency.git
+endolatency
+```
+
+The sample data and firmware are not part of a pip install; clone the repository to get them.
+
+**From source.**
+
+```
+git clone https://github.com/Prosper02/endoscope-latency.git
+cd endoscope-latency
 pip install -r requirements.txt
 python -m endolatency
 ```
 
-Python 3.10 or newer. On Windows, PDF export uses Chrome or Edge if installed; otherwise the
-HTML report is written and can be printed from any browser.
+On Windows, `run_endolatency.bat` does the same from a double-click and installs the
+dependencies the first time. Send a shortcut to it (or to `EndoLatency.exe`) to the Desktop
+for daily use.
+
+PDF export uses Chrome or Edge if installed; otherwise the HTML report is written and can be
+printed from any browser. The Arduino needs the firmware flashed once (see above); the app
+itself needs no driver beyond the one Windows installs for the UNO.
 
 ## Using the app
 
@@ -95,11 +119,13 @@ HTML report is written and can be printed from any browser.
 ## Repository layout
 
 ```
-endolatency/        the application (model, serial link, placement, analysis, Qt window)
+endolatency/        the application (model, serial link, placement, analysis, Qt window, icon)
 firmware/           Arduino sketch
 sample_data/        the ten runs of 21 September 2026 with metadata and ping records
 docs/               technical report of those runs
 tests/              pytest suite (python -m pytest)
+build_exe.py        PyInstaller build of the self-contained Windows folder
+.github/workflows/  CI: tests on every push, Windows package on every v* tag
 ```
 
 ## Results file format

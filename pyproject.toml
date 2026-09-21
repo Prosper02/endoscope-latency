@@ -24,3 +24,6 @@ endolatency = "endolatency.app:main"
 
 [tool.setuptools.packages.find]
 include = ["endolatency*"]
+
+[tool.setuptools.package-data]
+endolatency = ["assets/*"]
