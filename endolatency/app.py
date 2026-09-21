@@ -21,7 +21,7 @@ from .analysis import FIGURES, SH, compare_runs, edge_symmetry, export_report, f
 from .model import (APPLICATIONS, MEASURES, SCENES, SETUPS, Run, RunMeta, channels_for_setup, fmt, list_runs, measures_for_setup,
                     now_iso, run_summary, save_run)
 from .placement import Spot, annotate, describe_spot, find_led_spots, grab_monitors, placement_guide, sensor_verdict
-from .serial_link import ArduinoLink, PingWorker, available_ports
+from .serial_link import SerialLink, PingWorker, available_ports
 
 def resource_root() -> str:
     """Folder that holds sample_data/, firmware/ and endolatency/assets/ (repo root, site-packages, or the PyInstaller bundle)."""
@@ -105,7 +105,7 @@ class MainWindow(QMainWindow):
             self.setWindowIcon(QIcon(ICON_PATH))
         self.resize(1280, 820)
         self.settings = QSettings("EndoLatency", "EndoLatency")
-        self.link: ArduinoLink | None = None
+        self.link: SerialLink | None = None
         self.ping: PingWorker | None = None
         self.fw_ready = False
         self.measuring = False
@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
         lay = QVBoxLayout(root)
 
         top = QHBoxLayout()
-        top.addWidget(QLabel("Arduino port"))
+        top.addWidget(QLabel("Microcontroller port"))
         self.port_box = QComboBox()
         self.port_box.setMinimumWidth(220)
         top.addWidget(self.port_box)
@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self._build_measure_tab(), "Measure")
         self.tabs.addTab(self._build_placement_tab(), "Placement")
         self.tabs.addTab(self._build_analysis_tab(), "Analysis")
-        self.statusBar().showMessage("Connect the Arduino, choose the setup, then place the sensors or start a run.")
+        self.statusBar().showMessage("Connect the microcontroller, choose the setup, then place the sensors or start a run.")
 
     def _build_measure_tab(self) -> QWidget:
         w = QWidget()
@@ -460,9 +460,9 @@ class MainWindow(QMainWindow):
             return
         port = self.port_box.currentData()
         if not port:
-            QMessageBox.warning(self, "No port", "No serial port selected. Plug in the Arduino and press Refresh.")
+            QMessageBox.warning(self, "No port", "No serial port selected. Plug in the microcontroller and press Refresh.")
             return
-        self.link = ArduinoLink(port)
+        self.link = SerialLink(port)
         self.link.header_seen.connect(self._on_header)
         self.link.trial_received.connect(self._on_trial)
         self.link.raw_received.connect(self._on_raw)
@@ -477,7 +477,7 @@ class MainWindow(QMainWindow):
 
     def send(self, cmd: str) -> None:
         if not self.link:
-            self.statusBar().showMessage("Not connected to the Arduino.", 4000)
+            self.statusBar().showMessage("Not connected to the microcontroller.", 4000)
             return
         self.link.send(cmd)
 
@@ -506,7 +506,7 @@ class MainWindow(QMainWindow):
 
     def _require_firmware(self) -> bool:
         if not self.link:
-            QMessageBox.warning(self, "Not connected", "Connect the Arduino first.")
+            QMessageBox.warning(self, "Not connected", "Connect the microcontroller first.")
             return False
         if not getattr(self, "fw_ready", False):
             QMessageBox.information(self, "Board still starting", "Wait for the firmware header to appear next to the Connect button (about two seconds after connecting).")

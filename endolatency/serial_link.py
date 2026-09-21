@@ -1,4 +1,4 @@
-"""Background threads: the serial link to the Arduino firmware and a ping recorder."""
+"""Background threads: the serial link to the microcontroller firmware and a ping recorder."""
 from __future__ import annotations
 
 import os
@@ -14,16 +14,16 @@ from .model import parse_trial_line
 
 
 def available_ports() -> list[tuple[str, str]]:
-    """(device, description) for every serial port, Arduino-looking ports first."""
+    """(device, description) for every serial port, microcontroller ports first."""
     ports = [(p.device, p.description or "") for p in list_ports.comports()]
     ports.sort(key=lambda x: (0 if "arduino" in x[1].lower() or "usb serial" in x[1].lower() else 1, x[0]))
     return ports
 
 
-class ArduinoLink(QThread):
+class SerialLink(QThread):
     """Reads the firmware's serial output line by line and forwards commands to it.
 
-    Opening the port resets an Arduino UNO, so the firmware header appears about
+    Opening the port resets an ATmega328 microcontroller, so the firmware header appears about
     two seconds after connecting; wait for `header_seen` before sending settings.
     """
 

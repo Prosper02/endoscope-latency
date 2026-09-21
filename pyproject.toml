@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "endolatency"
 version = "0.1.0"
-description = "Desktop tool to measure glass-to-glass latency of an endoscope video chain and a telementoring link with an Arduino and two light sensors"
+description = "Desktop tool to measure glass-to-glass latency of an endoscope video chain and a telementoring link with an ATmega328 microcontroller and two light sensors"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

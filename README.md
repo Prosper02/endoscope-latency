@@ -1,7 +1,7 @@
 # EndoLatency
 
 Desktop tool for measuring the glass-to-glass latency of an endoscope video chain and of a
-telementoring link, using an Arduino UNO, two TEMT6000 light sensors and one LED.
+telementoring link, using an ATmega328 microcontroller, two TEMT6000 light sensors and one LED.
 It drives the measurement, guides sensor placement, analyses the results and exports a report,
 for either a **two-screen** setup (mentee screen plus mentor screen) or a **one-screen** setup.
 
@@ -11,14 +11,14 @@ Those runs ship in `sample_data/` and open from the Analysis tab.
 
 ## How it works
 
-The Arduino switches a white LED that sits in the endoscope's field of view and time-stamps
-the switch. A light sensor taped to each screen tells the Arduino when the flash appears
+The microcontroller switches a white LED that sits in the endoscope's field of view and time-stamps
+the switch. A light sensor taped to each screen tells the microcontroller when the flash appears
 (rise edge) and disappears (fall edge). Both screens are timed by the same microcontroller
 clock, so the difference between them, the link delay, needs no clock synchronisation between
 computers. The firmware reports one CSV line per trial; the app records, saves and analyses them.
 
 ```
-Arduino UNO ──A2──▶ LED ──▶ endoscope camera ──▶ capture ──▶ mentee PC ──▶ mentee screen ◀── sensor A (A0)
+ATmega328 ──A2──▶ LED ──▶ endoscope camera ──▶ capture ──▶ mentee PC ──▶ mentee screen ◀── sensor A (A0)
                                                                  │
                                                           telementoring link
                                                                  ▼
@@ -29,7 +29,7 @@ Arduino UNO ──A2──▶ LED ──▶ endoscope camera ──▶ capture �
 
 | Part | Connection |
 |---|---|
-| Arduino UNO | USB to the measurement PC |
+| ATmega328 microcontroller | USB to the measurement PC |
 | TEMT6000 breakout, sensor A | VCC → 5V, GND → GND, SIG → A0. Tape to the mentee (or only) screen |
 | TEMT6000 breakout, sensor B | VCC → 5V, GND → GND, SIG → A1. Tape to the mentor screen (two-screen setup) |
 | White LED | A2 → LED anode, cathode → 220 Ω → GND. Fix it inside the endoscope's field of view |
@@ -39,7 +39,7 @@ black tape or a cap and run the screens at maximum brightness.
 
 ## Firmware
 
-Flash `firmware/endoscope_latency/endoscope_latency.ino` once, with the Arduino IDE or:
+Flash `firmware/endoscope_latency/endoscope_latency.ino` once, with the microcontroller IDE or:
 
 ```
 arduino-cli compile --fqbn arduino:avr:uno firmware/endoscope_latency
@@ -82,12 +82,12 @@ dependencies the first time. Send a shortcut to it (or to `EndoLatency.exe`) to 
 for daily use.
 
 PDF export uses Chrome or Edge if installed; otherwise the HTML report is written and can be
-printed from any browser. The Arduino needs the firmware flashed once (see above); the app
+printed from any browser. The microcontroller needs the firmware flashed once (see above); the app
 itself needs no driver beyond the one Windows installs for the UNO.
 
 ## Using the app
 
-1. **Connect.** Pick the Arduino's port and press Connect. The board resets and reports its
+1. **Connect.** Pick the microcontroller's port and press Connect. The board resets and reports its
    firmware header; the app then parks it with the LED off.
 2. **Choose the setup** in the top bar: two screens (sensor A mentee, sensor B mentor), or one
    screen with sensor A or sensor B.
@@ -121,7 +121,7 @@ itself needs no driver beyond the one Windows installs for the UNO.
 
 ```
 endolatency/        the application (model, serial link, placement, analysis, Qt window, icon)
-firmware/           Arduino sketch
+firmware/           ATmega328 microcontroller sketch (Arduino IDE / arduino-cli format)
 sample_data/        the ten runs of 21 September 2026 with metadata and ping records
 docs/               technical report of those runs
 tests/              pytest suite (python -m pytest)

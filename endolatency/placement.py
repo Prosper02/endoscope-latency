@@ -181,7 +181,7 @@ def placement_guide(setup: str, scene: str) -> str:
     if setup == "two-screen":
         setup_steps = [
             "Sensor A (A0) goes on the mentee's local screen over the video window; sensor B (A1) goes on the mentor's screen over the received video.",
-            "Both sensors are timed by the same Arduino, so the mentor screen must be within cable reach (three wires: 5 V, GND, SIG; several metres is fine).",
+            "Both sensors are timed by the same microcontroller, so the mentor screen must be within cable reach (three wires: 5 V, GND, SIG; several metres is fine).",
             "Optionally enter the mentor host's address so a ping batch runs alongside the trials; report the RTT distribution with the link delay.",
         ]
     elif setup == "one-screen-a":

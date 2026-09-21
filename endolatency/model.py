@@ -1,6 +1,6 @@
 """Data model, file formats and statistics for endoscope latency runs.
 
-A *run* is one continuous series of trials recorded from the Arduino firmware.
+A *run* is one continuous series of trials recorded from the microcontroller firmware.
 On disk a run is three files with the same stem:
     <stem>.csv        the serial log exactly as received (comment lines kept)
     <stem>.json       run metadata (setup, application, scene, sensor placement, threshold, notes)
