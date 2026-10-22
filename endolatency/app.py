@@ -24,7 +24,7 @@ from .placement import Spot, annotate, describe_spot, find_led_spots, grab_monit
 from .serial_link import SerialLink, PingWorker, available_ports
 
 def resource_root() -> str:
-    """Folder that holds sample_data/, firmware/ and endolatency/assets/ (repo root, site-packages, or the PyInstaller bundle)."""
+    """Folder that holds firmware/ and endolatency/assets/ (repo root, site-packages, or the PyInstaller bundle)."""
     if getattr(sys, "frozen", False):
         exe_dir = os.path.dirname(sys.executable)
         for base in (getattr(sys, "_MEIPASS", None), exe_dir, os.path.join(exe_dir, "_internal")):
@@ -36,7 +36,6 @@ def resource_root() -> str:
 
 ROOT = resource_root()
 ICON_PATH = os.path.join(ROOT, "endolatency", "assets", "icon.ico")
-SAMPLE_DIR = os.path.join(ROOT, "sample_data", "2026-09-21")
 DEFAULT_SESSIONS = os.path.join(os.path.expanduser("~"), "Documents", "EndoLatency", "sessions")
 
 
@@ -339,13 +338,6 @@ class MainWindow(QMainWindow):
         b2 = QPushButton("Reload")
         b2.clicked.connect(self.load_runs)
         row2.addWidget(b2)
-        b3 = QPushButton("Open sample data")
-        b3.setToolTip("The ten runs recorded on 21 September 2026 that ship with the app")
-        b3.clicked.connect(self.open_sample)
-        if not os.path.isdir(SAMPLE_DIR):
-            b3.setEnabled(False)
-            b3.setToolTip("Sample data is not included in this installation; clone the repository to get it")
-        row2.addWidget(b3)
         ll.addLayout(row2)
         ll.addWidget(QLabel("Runs (select one or more; the first selected is the comparison baseline)"))
         self.run_list = QListWidget()
@@ -768,10 +760,6 @@ class MainWindow(QMainWindow):
         if d:
             self.an_folder.setText(d)
             self.load_runs()
-
-    def open_sample(self) -> None:
-        self.an_folder.setText(SAMPLE_DIR)
-        self.load_runs()
 
     def load_runs(self) -> None:
         self.runs = list_runs(self.an_folder.text())

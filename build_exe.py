@@ -19,7 +19,6 @@ cmd = [
     sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--windowed", "--name", "EndoLatency",
     "--icon", icon,
     "--add-data", f"endolatency{os.sep}assets{sep}endolatency{os.sep}assets",
-    "--add-data", f"sample_data{sep}sample_data",
     "--add-data", f"firmware{sep}firmware",
     "--collect-submodules", "endolatency",
     "--hidden-import", "serial.tools.list_ports",

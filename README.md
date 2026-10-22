@@ -5,10 +5,6 @@ telementoring link, using an ATmega328 microcontroller, two TEMT6000 light senso
 It drives the measurement, guides sensor placement, analyses the results and exports a report,
 for either a **two-screen** setup (mentee screen plus mentor screen) or a **one-screen** setup.
 
-The method, the numbers it produced on 21 September 2026 and their interpretation are in the
-technical report [docs/2026-09-21_endoscope_latency_report.pdf](docs/2026-09-21_endoscope_latency_report.pdf).
-Those runs ship in `sample_data/` and open from the Analysis tab.
-
 ## How it works
 
 The microcontroller switches a white LED that sits in the endoscope's field of view and time-stamps
@@ -66,7 +62,7 @@ pip install git+https://github.com/Prosper02/endoscope-latency.git
 endolatency
 ```
 
-The sample data and firmware are not part of a pip install; clone the repository to get them.
+The firmware is not part of a pip install; clone the repository to get it.
 
 **From source.**
 
@@ -83,7 +79,7 @@ for daily use.
 
 PDF export uses Chrome or Edge if installed; otherwise the HTML report is written and can be
 printed from any browser. The microcontroller needs the firmware flashed once (see above); the app
-itself needs no driver beyond the one Windows installs for the UNO.
+itself needs no driver beyond the USB-serial driver Windows installs for the board.
 
 ## Using the app
 
@@ -122,8 +118,6 @@ itself needs no driver beyond the one Windows installs for the UNO.
 ```
 endolatency/        the application (model, serial link, placement, analysis, Qt window, icon)
 firmware/           ATmega328 microcontroller sketch (Arduino IDE / arduino-cli format)
-sample_data/        the ten runs of 21 September 2026 with metadata and ping records
-docs/               technical report of those runs
 tests/              pytest suite (python -m pytest)
 build_exe.py        PyInstaller build of the self-contained Windows folder
 .github/workflows/  CI: tests on every push, Windows package on every v* tag
