@@ -4,11 +4,12 @@
 //   A0  <- SIG of TEMT6000 taped to the LOCAL (mentee) screen
 //   A1  <- SIG of TEMT6000 taped to the MENTOR screen
 //   A2  -> white LED (+ series resistor to GND), placed in the endoscope's field of view
+//   A3  -> held HIGH as a 5 V supply for a second sensor's VCC (a TEMT6000 draws under 1 mA)
 //
 // Each trial:
-//   1. LED off for DARK_MS, measure the dark level of each sensor            (base)
+//   1. LED off for DARK_MS + random 0..JITTER_MS, measure the dark level       (base)
 //   2. LED on  -> time until each screen rises above  base + threshold        (rise, ON edge)
-//   3. LED stays on for LIT_MS so the camera exposure settles, measure level   (lit)
+//   3. LED on for LIT_MS + random 0..JITTER_MS so exposure settles, measure    (lit)
 //   4. LED off -> time until each screen falls below (lit + base) / 2         (fall, OFF edge)
 // A fall is only attempted on a channel whose lit level is at least MIN_SWING above base.
 //
@@ -29,6 +30,7 @@
 const int LED_PIN    = A2;   // A2 used as a digital output
 const int MENTEE_PIN = A0;
 const int MENTOR_PIN = A1;
+const int SUPPLY_PIN = A3;   // spare 5 V output for a sensor's VCC
 
 int threshold = 30;                           // ADC counts above dark level (0..1023). 30 suits a black endoscope view; 80+ if desktop content is under a sensor
 const int CONFIRM = 3;                        // consecutive samples past the level to count as detected
@@ -36,6 +38,7 @@ const int MIN_SWING = 4;                      // minimum lit-minus-dark swing (A
 const unsigned long DARK_MS    = 2500;        // LED off time so both screens settle to dark
 const unsigned long LIT_MS     = 2500;        // LED on time so both screens / camera exposure settle
 const unsigned long TIMEOUT_US = 5000000UL;   // give up on an edge after 5 s
+const long JITTER_MS = 200;                   // random 0..JITTER_MS added before each edge so it lands at a random video-frame phase
 
 bool rawMode = false;
 bool useA = true, useB = true;                // which channels a trial waits on
@@ -114,9 +117,13 @@ void printDiff(unsigned long tb, unsigned long ta) {
 void setup() {
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
+  pinMode(SUPPLY_PIN, OUTPUT);
+  digitalWrite(SUPPLY_PIN, HIGH);
   Serial.begin(115200);
   Serial.setTimeout(50);
-  Serial.println(F("# endoscope latency probe, both edges  (A0=mentee, A1=mentor, A2=LED)"));
+  randomSeed(analogRead(A4) ^ (analogRead(A5) << 5) ^ micros());  // A4/A5 unconnected
+  Serial.print(F("# endoscope latency probe, both edges  (A0=mentee, A1=mentor, A2=LED), random edge delay 0-"));
+  Serial.print(JITTER_MS); Serial.println(F(" ms"));
   Serial.println(F("# commands: r=raw (LED off), l=raw (LED on), m=measure, t<n>=threshold, a/b/x=channel A/B/both"));
   Serial.print(F("# threshold=")); Serial.println(threshold);
   printHeader();
@@ -135,7 +142,7 @@ void loop() {
 
   // 1. dark phase
   digitalWrite(LED_PIN, LOW);
-  delay(DARK_MS);
+  delay(DARK_MS + random(JITTER_MS + 1));
   int baseA = readAvg(MENTEE_PIN, 8);
   int baseB = readAvg(MENTOR_PIN, 8);
 
@@ -147,7 +154,7 @@ void loop() {
   if (Serial.available()) return;
 
   // 3. lit phase
-  delay(LIT_MS);
+  delay(LIT_MS + random(JITTER_MS + 1));
   int litA = readAvg(MENTEE_PIN, 8);
   int litB = readAvg(MENTOR_PIN, 8);
   bool okA = useA && (litA - baseA) >= MIN_SWING;
